@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="public/styles/mainStyle.css" />
+    <link rel="stylesheet" href="public/styles/solicitudPage.css" />
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Historial</title>
+  </head>
+
+  <body>
+    <header>
+      <img src="public/images/bbLogo.png" class="logo" />
+      <p><strong>Biblio-Booking</strong></p>
+      <div class="containerRight">
+        <a href="startPage.html"><input type="submit" class="btnBack" value="Regresar"/></a>
+    </div>
+    </header>
+    
+    <div class="container">
+        <div class="column left-column">
+            <div class="title">
+                <h1>Historial órdenes</h1>
+            </div>
+          <br />
+          <div class="formulario">
+            <label for="busqueda" hidden><strong>Consultar por ID orden:</label></strong>
+            <input hidden type="text" id="busqueda" name="busqueda" style="border: 3px solid #d9d9d9; width: 100px" required/><br />
+            <h2><label >Lista de apartados:</label></h2>
+            <h4><div id="dataDisplay"></div></h4>
+            
+          </div>
+        </div>
+        <div class="column right-column">
+            <label for="numero">Numero del cubiculo:</label>
+            <br />
+            <input type="text" id="numero" name="ubicacion" required />
+            <div class="campo">
+              <label for="fecha">Seleccione una fecha:</label>
+    
+              <input
+                type="date"
+                id="fecha"
+                name="fecha"
+                value=""
+              />
+              <script>
+                document.getElementById("fecha").valueAsDate = new Date();
+              </script>
+            </div>
+            <div class="campo">
+              <label for="hora">Hora de asignacion:</label>
+    
+              <select id="hora" name="hora">
+                <option value="07:30">07:30</option>
+                <option value="07:45">07:45</option>
+                <option value="08:00">08:00</option>
+                <option value="08:15">08:15</option>
+                <option value="08:30">08:30</option>
+                <option value="08:45">08:45</option>
+                <option value="09:00">09:00</option>
+                <option value="09:15">09:15</option>
+                <option value="09:30">09:30</option>
+                <option value="09:45">09:45</option>
+                <option value="10:00">10:00</option>
+                <option value="10:15">10:15</option>
+                <option value="10:30">10:30</option>
+                <option value="10:45">10:45</option>
+                <option value="11:00">11:00</option>
+                <option value="11:15">11:15</option>
+                <option value="11:30">11:30</option>
+                <option value="11:45">11:45</option>
+                <option value="12:00">12:00</option>
+                <option value="12:15">12:15</option>
+                <option value="12:30">12:30</option>
+                <option value="12:45">12:45</option>
+                <option value="13:00">13:00</option>
+                <option value="13:15">13:15</option>
+                <option value="13:30">13:30</option>
+                <option value="13:45">13:45</option>
+                <option value="14:00">14:00</option>
+                <option value="14:15">14:15</option>
+                <option value="14:30">14:30</option>
+                <option value="14:45">14:45</option>
+                <option value="15:00">15:00</option>
+                <option value="15:15">15:15</option>
+                <option value="15:30">15:30</option>
+                <option value="15:45">15:45</option>
+                <option value="16:00">16:00</option>
+                <option value="16:15">16:15</option>
+                <option value="16:30">16:30</option>
+                <option value="16:45">16:45</option>
+                <option value="17:00">17:00</option>
+                <option value="17:15">17:15</option>
+                <option value="17:30">17:30</option>
+                <option value="17:45">17:45</option>
+                <option value="18:00">18:00</option>
+                <option value="18:15">18:15</option>
+                <option value="18:30">18:30</option>
+                <option value="18:45">18:45</option>
+                <option value="19:00">19:00</option>
+                <option value="19:15">19:15</option>
+                <option value="19:30">19:30</option>
+              </select>
+            </div>
+            <a id="downloadLink" download="QR_Asignacion.png" href="#" style="display: none">Descargar CódigoQR</a>
+            <h4><div id="dataDisplay2"></div></h4>
+            <input id = "botonEliminar" type="button" class="btn" value="Eliminar apartado" style="margin-bottom: 5px;"/><br />
+            <input id = "botonConfirmar" type="button" class="btn" value="Confirmar apartado"/>
+            <div class="codigoQR" id="codigoQR"> </div>
+        </div>
+      </div>
+
+      <script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
+      <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyBs0ZtPmiewSJ5orwoYTuZKuD1uPlJlpOU",
+          authDomain: "pruebareque2.firebaseapp.com",
+          databaseURL: "https://pruebareque2-default-rtdb.firebaseio.com",
+          projectId: "pruebareque2",
+          storageBucket: "pruebareque2.appspot.com",
+          messagingSenderId: "430710672818",
+          appId: "1:430710672818:web:8417957c13b58d8beba8ab",
+          measurementId: "G-ZHHEESZQXC"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+
+        var messagesRef = firebase.database().ref('Asignacion');
+        var messagesRef2 = firebase.database().ref('Usuario');
+        buscarAsignacion();
+        function buscarAsignacion(){
+          var carnet=localStorage.getItem("carnet");
+          messagesRef.once('value', function(snapshot) {
+          var data = snapshot.val();
+          var dataDisplay = document.getElementById('dataDisplay');
+          dataDisplay.innerHTML = '';
+            for (var key in data) {
+              var item = data[key];
+              if(carnet==item.carnet){
+                dataDisplay.innerHTML += '------------------------------------------';
+                for(var dato in item){
+                  if(dato!="acompañantes"){
+                    dataDisplay.innerHTML += '<p>'+dato+' : '+item[dato]+'</p><br>';
+                  }
+                }
+              }
+            }
+          });
+        }
+        
+        document
+          .getElementById("botonEliminar")
+          .addEventListener("click", eliminarAsignacion);
+
+        function eliminarAsignacion(){
+          var idCubiculo = "cub"+getInputVal('numero');
+          var hora = getInputVal('hora');
+          var fecha = getInputVal('fecha');
+          messagesRef.once('value', function(snapshot) {
+            var data = snapshot.val();
+            var dataDisplay2 = document.getElementById('dataDisplay2');
+            dataDisplay2.innerHTML = '';
+            for (var key in data) {
+                var item = data[key];
+                if (item.idCubiculo==idCubiculo && item.horaEnt==hora && item.fecha==fecha) {
+                  messagesRef.child(key).remove()
+                  dataDisplay2.innerHTML += '<p>Dato eliminado</p>';
+                }
+            }
+            if (dataDisplay2.innerHTML == '') {
+                dataDisplay2.innerHTML += '<p>La asignacion no existe</p>';
+            }
+            buscarAsignacion();
+          });
+        }
+
+        document
+          .getElementById("botonConfirmar")
+          .addEventListener("click", generarQR);
+
+        function generarQR() {
+          var carnet = localStorage.getItem("carnet");
+          var idCubiculo = "cub"+getInputVal('numero');
+          var hora = getInputVal('hora');
+          var fecha = getInputVal('fecha');
+          var llaveA = "";
+          var llaveU = "";
+
+          messagesRef.once('value', function(snapshot) {
+              var data = snapshot.val();
+              var dataDisplay2 = document.getElementById('dataDisplay2');
+
+              // Limpia la pantalla
+              dataDisplay2.innerHTML = '';
+              var downloadLink = document.getElementById('downloadLink');
+              var codigoQR = document.getElementById('codigoQR');
+              codigoQR.style.justifyContent = "center";
+              codigoQR.style.display = "flex";
+              codigoQR.innerHTML = '';
+
+              for (var key in data) {
+              var item = data[key];
+              if (item.carnet == carnet && item.idCubiculo==idCubiculo && item.horaEnt==hora && item.fecha==fecha) {
+                  codigoQR.innerHTML = '';
+                  var qr = new QRCode(codigoQR, {
+                  text: key + "\n" + carnet + "\n" + item.fecha,
+                  width: 200,
+                  height: 200,
+                  correctLevel: QRCode.CorrectLevel.H
+                  });
+                  llaveA = key;
+                  messagesRef.child(llaveA).update({ confirmado: "Si"});
+                  downloadLink.style.display='block'
+              }
+              }
+              if (codigoQR.innerHTML == '') {
+              codigoQR.innerHTML += '<p>No existen similitudes</p>';
+              }
+              if (llaveA != "") {
+              messagesRef2.once('value', function(snapshot) {
+                  var data2 = snapshot.val();
+                  for (var key in data2) {
+                  var item2 = data2[key];
+                  if (item2.carnet == carnet) {
+                      llaveU = key;
+                  }
+                  }
+                  downloadLink.href = codigoQR.getElementsByTagName('canvas')[0].toDataURL();
+                  var form = document.createElement('form');
+                  item2 = data2[llaveU];
+                  form.action = 'https://formsubmit.co/' + item2.email;
+                  form.method = 'POST';
+                  form.target = '_blank';
+                  form.innerHTML = '<input type="hidden" name="QR_Asignacion(link solo funciona si el correo no esta siendo traducido)" value="' + downloadLink.href + '">';
+                  document.body.appendChild(form);
+                  form.submit();
+                  document.body.removeChild(form);
+                  dataDisplay2.innerHTML += '<p>Correo enviado exitosamente</p>';
+                  buscarAsignacion();
+              });
+              }
+          });
+        }
+
+        // Function to get form values
+        function getInputVal(id) {
+          return document.getElementById(id).value;
+        }
+      </script>
+  </body>
+</html>

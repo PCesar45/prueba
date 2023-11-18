@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="public/styles/mainStyle.css" />
+    <link rel="stylesheet" href="public/styles/solicitudPage.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Cubículos</title>
+  </head>
+  <header>
+    <img src="public/images/bbLogo.png" class="logo" />
+    <label><strong>Biblio-Booking</strong></label>
+  </header>
+
+  <body>
+    <form id="contenedor">
+      <div class="container" id="contactForm">
+        <div class="column left-column">
+          <div class="title">
+            <h1>Agregar cubículo</h1>
+          </div>
+
+          <br /> <br />
+          <div class="formulario">
+            <label for="nombre">Nombre del cubículo:</label>
+            <br />
+            <input type="text" id="nombre" name="nombre" required />
+            <br />
+            <label for="numero">Número del cubículo:</label>
+            <br />
+            <input type="text" id="numero" name="numero" required />
+            <br />
+            <label for="ubicacion">Ubicación:</label>
+            <br />
+            <input type="text" id="ubicacion" name="ubicacion" required />
+            <br />
+            <label for="capacidad">Capacidad:</label>
+            <br />
+            <input type="text" id="capacidad" name="capacidad" required />
+            <br />
+            <label for="servicioE">Servicios Especiales:</label>
+            <br />
+            <select id="servicioE" name="servicioE">
+              <option value="No">No</option>
+              <option value="Si">Si</option>
+            </select>
+            <br />
+            <label for="estado">Estado:</label>
+            <br />
+            <select id="estado" name="estado">
+              <option value="Libre">Libre</option>
+              <option value="Ocupado">Ocupado</option>
+              <option value="Mantenimiento">Mantenimiento</option>
+            </select>
+            <br />
+            
+          </div>
+        </div>
+        <div class="column right-column">
+          
+          <br />
+
+          <a 
+            ><input id="btnAgregar" type="button" class="btn" value="Agregar cubículo" onclick="return confirm('¿Está seguro de que quiere agregar este cubículo?')" />
+          </a>
+          <h4><div id="dataDisplay" style = "display: flex; justify-content: center"></div></h4>
+        </div>
+      </div>
+    </form>
+    <script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyBs0ZtPmiewSJ5orwoYTuZKuD1uPlJlpOU",
+        authDomain: "pruebareque2.firebaseapp.com",
+        databaseURL: "https://pruebareque2-default-rtdb.firebaseio.com",
+        projectId: "pruebareque2",
+        storageBucket: "pruebareque2.appspot.com",
+        messagingSenderId: "430710672818",
+        appId: "1:430710672818:web:8417957c13b58d8beba8ab",
+        measurementId: "G-ZHHEESZQXC"
+      };
+      // Function to get form values
+      function getInputVal(id) {
+        return document.getElementById(id).value;
+      }
+
+      firebase.initializeApp(firebaseConfig);
+
+      var messagesRef = firebase.database().ref('Cubiculo');
+      
+      document
+        .getElementById("btnAgregar")
+        .addEventListener("click", agregarCubiculo);
+
+      function agregarCubiculo() {
+        //e.preventDefault();
+
+        // Get values
+        var nombre =getInputVal('nombre');
+        var numero =getInputVal('numero');
+        var ubicacion =getInputVal('ubicacion');
+        var capacidad =getInputVal('capacidad');
+        var servicios =document.getElementById("servicioE").value;
+        var estado =document.getElementById("estado").value;
+        
+        var dataDisplay = document.getElementById('dataDisplay');
+
+        // Limpia la pantalla
+        dataDisplay.innerHTML = '';
+        if (numero=='' || ubicacion=='' || capacidad=='' || servicios=='' || estado=='') {
+          dataDisplay.innerHTML += '<p>Llene todos los espacios en blanco</p>';
+        }else{
+          messagesRef.once('value', function(snapshot) {
+            var data = snapshot.val();
+            var dataDisplay = document.getElementById('dataDisplay');
+
+            // Limpia la pantalla
+            dataDisplay.innerHTML = '';
+
+            // Agrega toda la informacion a pantalla de la clase seleccionada
+            for (var key in data) {
+                var item = data[key];
+                // Se puede cambiar .startsWith() por .includes() para que detecta las palabras buscadas en cualquier posicion de las palabras almacenadas
+                if (item.idCubiculo.toLowerCase().startsWith("cub"+numero)==true ) {
+                    dataDisplay.innerHTML = '';
+                    dataDisplay.innerHTML += '<p>Numero de cubiculo ya existente, por favor ingrese otro. </p>';
+                }
+            }
+            if (dataDisplay.innerHTML == '') {
+              saveMessage(nombre,numero,ubicacion,capacidad,servicios,estado);
+              dataDisplay.innerHTML += '<p>Cubículo agregado</p>';
+              document.getElementById('contenedor').reset();
+            }
+          });
+        }
+        
+        
+      }
+
+      
+
+      //Función para guardar datos anidados en la base 
+      function saveMessage(nombre,numero,ubicacion,capacidad,servicios,estado) {
+            var newMessageRef = messagesRef.push();
+            newMessageRef.set({
+              nombre :nombre,
+              idCubiculo:"cub"+numero,
+              ubicacion :ubicacion,
+              capacidad :capacidad,
+              servicioE :servicios,
+              idEstadoC :estado,
+              tiempoMaxUso:"0",
+                
+            });
+        }
+
+    </script>
+  </body>
+</html>

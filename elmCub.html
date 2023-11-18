@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="public/styles/mainStyle.css" />
+    <link rel="stylesheet" href="public/styles/solicitudPage.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Cubículos</title>
+  </head>
+  <header>
+    <img src="public/images/bbLogo.png" class="logo" />
+    <label><strong>Biblio-Booking</strong></label>
+  </header>
+
+  <body>
+    <div class="container" >
+      <form id="contactForm" class="column left-column">
+      <div>
+        <div>
+          
+          <div class="title">
+            <h1>Eliminar cubículo</h1>
+          </div>
+          <br />
+
+          <div class="formulario" id="formulario1">
+            <label for="numero">Número de cubículo a eliminar:</label>
+            <br />
+            <input type="text" id="numero" name="numero" required />
+            <br />
+          </div>
+        </div>
+
+        <div class="column right-column">
+          <div class="title">
+          </div>
+          <br />
+          <input id="btnEliminar" type="button" class="btn" value="Eliminar cubículo"  onclick="return confirm('¿Está seguro de que quiere eliminar este cubículo?')" /><br />
+          <h4><div id="dataDisplay" style = "display: flex; justify-content: center"></div></h4>
+        </div>
+      </div>
+    </form>
+    <script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyBs0ZtPmiewSJ5orwoYTuZKuD1uPlJlpOU",
+        authDomain: "pruebareque2.firebaseapp.com",
+        databaseURL: "https://pruebareque2-default-rtdb.firebaseio.com",
+        projectId: "pruebareque2",
+        storageBucket: "pruebareque2.appspot.com",
+        messagingSenderId: "430710672818",
+        appId: "1:430710672818:web:8417957c13b58d8beba8ab",
+        measurementId: "G-ZHHEESZQXC"
+      };
+      // Function to get form values
+      function getInputVal(id) {
+        return document.getElementById(id).value;
+      }
+
+      firebase.initializeApp(firebaseConfig);
+
+      var messagesRef = firebase.database().ref('Cubiculo');
+      var messagesRef2 = firebase.database().ref('Asignacion');
+      var messagesRef3 = firebase.database().ref('Usuario');
+      
+      document
+        .getElementById("btnEliminar")
+        .addEventListener("click", eliminarCubiculo);
+
+      function eliminarCubiculo() {
+        //e.preventDefault();
+
+        // Get values
+        var idCubiculo ="cub"+getInputVal('numero');
+        
+        messagesRef.once('value', function(snapshot) {
+        var data = snapshot.val();
+        var dataDisplay = document.getElementById('dataDisplay');
+
+        // Limpia la pantalla
+        dataDisplay.innerHTML = '';
+
+        // Agrega toda la informacion a pantalla de la clase seleccionada
+        for (var key in data) {
+            var item = data[key];
+            // Se puede cambiar .startsWith() por .includes() para que detecta las palabras buscadas en cualquier posicion de las palabras almacenadas
+            if (item.idCubiculo.toLowerCase()==idCubiculo ) {
+                messagesRef.child(key).remove()
+                dataDisplay.innerHTML += '<p>Dato eliminado</p>';
+                break
+            }
+        }
+        if (dataDisplay.innerHTML == '') {
+            dataDisplay.innerHTML += '<p>No existen similitudes</p>';
+        }
+        });
+        document.getElementById('contactForm').reset();
+        //
+        //Eliminar asignaciones relacionadas al cubiculo 
+        //
+        messagesRef2.once('value', function(snapshot) {
+        var data = snapshot.val();
+        var dataDisplay = document.getElementById('dataDisplay');
+      
+        // Agrega toda la informacion a pantalla de la clase seleccionada
+        for (var key in data) {
+            var item = data[key];
+            // Se puede cambiar .startsWith() por .includes() para que detecta las palabras buscadas en cualquier posicion de las palabras almacenadas
+            if (item.idCubiculo.toLowerCase()==idCubiculo ) {
+                var fecha = item.fecha;
+                var hora = item.horaEnt;
+                var carnet = item.carnet;
+                messagesRef2.child(key).remove()
+
+                messagesRef3.once('value', function(snapshot) {
+                var form = document.createElement('form');
+                var data2 = snapshot.val();
+                for (var key in data2) {
+                  var item2 = data2[key];
+                  if (item2.carnet==carnet){
+                    email=item2.email;
+                    form.action = 'https://formsubmit.co/' + email;
+                    form.method = 'POST';
+                    form.target = '_blank';
+                    var info = document.createElement('input');
+                    info.name = 'Biblioteca Jose Figueres Ferrer';
+                    info.value = "Su asignacion el " + fecha + " a las " + hora + " ha sido eliminada";
+                    form.appendChild(info);
+                    document.body.appendChild(form);
+                    form.submit();
+                    document.body.removeChild(form);
+                  }
+                } 
+                });
+            }
+        }
+        });
+      }
+    </script>
+  </body>
+</html>

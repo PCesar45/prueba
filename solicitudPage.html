@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="public/styles/mainStyle.css" />
+    <link rel="stylesheet" href="public/styles/solicitudPage.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Cubículos</title>
+  </head>
+  <header>
+    <img src="public/images/bbLogo.png" class="logo" />
+    <label><strong>Biblio-Booking</strong></label>
+  </header>
+
+  <body>
+    <div class="container" >
+      <form id="contactForm" class="column left-column">
+        
+      <div>
+        <div class="title">
+          <h1>Solicitar cubículo</h1>
+        </div>
+        <div class="campo">
+          <label for="hora">Seleccione una hora:</label>
+
+          <select id="hora" name="hora">
+            <option value="07:30">07:30</option>
+            <option value="07:45">07:45</option>
+            <option value="08:00">08:00</option>
+            <option value="08:15">08:15</option>
+            <option value="08:30">08:30</option>
+            <option value="08:45">08:45</option>
+            <option value="09:00">09:00</option>
+            <option value="09:15">09:15</option>
+            <option value="09:30">09:30</option>
+            <option value="09:45">09:45</option>
+            <option value="10:00">10:00</option>
+            <option value="10:15">10:15</option>
+            <option value="10:30">10:30</option>
+            <option value="10:45">10:45</option>
+            <option value="11:00">11:00</option>
+            <option value="11:15">11:15</option>
+            <option value="11:30">11:30</option>
+            <option value="11:45">11:45</option>
+            <option value="12:00">12:00</option>
+            <option value="12:15">12:15</option>
+            <option value="12:30">12:30</option>
+            <option value="12:45">12:45</option>
+            <option value="13:00">13:00</option>
+            <option value="13:15">13:15</option>
+            <option value="13:30">13:30</option>
+            <option value="13:45">13:45</option>
+            <option value="14:00">14:00</option>
+            <option value="14:15">14:15</option>
+            <option value="14:30">14:30</option>
+            <option value="14:45">14:45</option>
+            <option value="15:00">15:00</option>
+            <option value="15:15">15:15</option>
+            <option value="15:30">15:30</option>
+            <option value="15:45">15:45</option>
+            <option value="16:00">16:00</option>
+            <option value="16:15">16:15</option>
+            <option value="16:30">16:30</option>
+            <option value="16:45">16:45</option>
+            <option value="17:00">17:00</option>
+            <option value="17:15">17:15</option>
+            <option value="17:30">17:30</option>
+            <option value="17:45">17:45</option>
+            <option value="18:00">18:00</option>
+            <option value="18:15">18:15</option>
+            <option value="18:30">18:30</option>
+            <option value="18:45">18:45</option>
+            <option value="19:00">19:00</option>
+            <option value="19:15">19:15</option>
+            <option value="19:30">19:30</option>
+          </select>
+        </div>
+        <br />
+        <div class="campo">
+          <label for="fecha">Seleccione una fecha:</label>
+
+          <input
+            type="date"
+            id="fecha"
+            name="fecha"
+            value=""
+          />
+          <script>
+            document.getElementById("fecha").valueAsDate = new Date();
+          </script>
+        </div>
+        <br />
+        <div class="campo">
+          <label for="numero">Número del cubículo:</label>
+          <br />
+          <input type="text" id="numero" name="numero" required />
+          <br /><br />
+        </div>
+        <br />
+
+        <br />
+        <label>Información de los acompañantes:</label>
+        <br />
+        <div class="formulario">
+          <!-- Sección para el acompañante 1 -->
+          <label for="carnet1">Acompañante 1:</label>
+          <br />
+          <label for="carnet1">Carnet:</label>
+          <br />
+          <input type="text" id="carnet1" name="carnet1" required />
+          <br />
+          <label for="nombre1">Nombre:</label>
+          <br />
+          <input type="text" id="nombre1" name="nombre1" required />
+          <br />
+          <label for="correo1">Correo:</label>
+          <br />
+          <input type="text" id="correo1" name="correo1" required />
+          <br />
+        </div>
+        <div class="formulario">
+          <!-- Sección para el acompañante 2 -->
+          <label for="carnet2">Acompañante 2:</label>
+          <br />
+          <label for="carnet2">Carnet:</label>
+          <br />
+          <input type="text" id="carnet2" name="carnet2" required />
+          <br />
+          <label for="nombre2">Nombre:</label>
+          <br />
+          <input type="text" id="nombre2" name="nombre2" required />
+          <br />
+          <label for="correo2">Correo:</label>
+          <br />
+          <input type="text" id="correo2" name="correo2" required />
+          <br />
+        </div>
+        <div class="formulario">
+          <!-- Sección para el acompañante 3 -->
+          <label for="carnet3">Acompañante 3:</label>
+          <br />
+          <label for="carnet3">Carnet:</label>
+          <br />
+          <input type="text" id="carnet3" name="carnet3" />
+          <br />
+          <label for="nombre3">Nombre:</label>
+          <br />
+          <input type="text" id="nombre3" name="nombre3" />
+          <br />
+          <label for="correo3">Correo:</label>
+          <br />
+          <input type="text" id="correo3" name="correo3" />
+          <br />
+        </div>
+        <div class="formulario">
+          <!-- Sección para el acompañante 4 -->
+          <label for="carnet4">Acompañante 4:</label>
+          <br />
+          <label for="carnet4">Carnet:</label>
+          <br />
+          <input type="text" id="carnet4" name="carnet4" />
+          <br />
+          <label for="nombre4">Nombre:</label>
+          <br />
+          <input type="text" id="nombre4" name="nombre4" />
+          <br />
+          <label for="correo4">Correo:</label>
+          <br />
+          <input type="text" id="correo4" name="correo4" />
+          <br />
+        </div>
+        <div class="formulario">
+          <!-- Sección para el acompañante 5 -->
+          <label for="carnet5">Acompañante 5:</label>
+          <br />
+          <label for="carnet5">Carnet:</label>
+          <br />
+          <input type="text" id="carnet5" name="carnet5" />
+          <br />
+          <label for="nombre5">Nombre:</label>
+          <br />
+          <input type="text" id="nombre5" name="nombre5" />
+          <br />
+          <label for="correo5">Correo:</label>
+          <br />
+          <input type="text" id="correo5" name="correo5" />
+          <br />
+        </div>
+      </div>
+    </form>
+      <div class="column right-column">
+        <div class="title">
+        </div>
+        <br />
+        <input id="btnEnviar" type="button" class="btn" value="Enviar solicitud"  /><br />
+        <h4><div id="dataDisplay" style = "display: flex; justify-content: center"></div></h4>
+      </div>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyBs0ZtPmiewSJ5orwoYTuZKuD1uPlJlpOU",
+        authDomain: "pruebareque2.firebaseapp.com",
+        databaseURL: "https://pruebareque2-default-rtdb.firebaseio.com",
+        projectId: "pruebareque2",
+        storageBucket: "pruebareque2.appspot.com",
+        messagingSenderId: "430710672818",
+        appId: "1:430710672818:web:8417957c13b58d8beba8ab",
+        measurementId: "G-ZHHEESZQXC"
+      };
+
+      firebase.initializeApp(firebaseConfig);
+
+      var messagesRefAsignacion = firebase.database().ref('Asignacion');
+      var messagesRefCubiculo = firebase.database().ref('Cubiculo');
+      
+      document
+        .getElementById("btnEnviar")
+        .addEventListener("click", enviarSolicitud);
+
+      function enviarSolicitud() {
+        //Almacena los datos de los acompañantes
+        var acompañantes = [];
+        // Get values
+        var hora = document.getElementById("hora").value;
+        var fecha = getInputVal('fecha');
+        var idCubiculo ="cub"+ getInputVal("numero");
+        var carnet=localStorage.getItem("carnet");
+        var dataDisplay = document.getElementById('dataDisplay');
+        var existe = false;
+        var ocupado = false;
+        var estado = false
+        var horaSal="Sin definir";
+        var cantAceptada = true;//Para verificar si la cantidad de acompañantes cabe en el cubiculo
+        // Limpia la pantalla
+        dataDisplay.innerHTML = '';
+
+        if (hora=='' || fecha=='' || idCubiculo=='cub' || carnet=='') {
+          dataDisplay.innerHTML += '<p>Llene todos los espacios en blanco</p>';
+        }else {
+          messagesRefCubiculo.once('value', function(snapshot) {
+          var data1 = snapshot.val();
+
+          for (var key in data1) {
+              var item1 = data1[key];
+              if (item1.idCubiculo.toLowerCase()==idCubiculo) {
+                existe = true;
+                if(item1.idEstadoC == "Ocupado" || item1.idEstadoC == "Mantenimiento"){
+                  estado = true;
+                }
+              }
+          }
+          if (existe == true) {
+            messagesRefAsignacion.once('value', function(snapshot) {
+            var data = snapshot.val();
+              //verifica si el cubilo ya tiene una asignacion a esa hora
+            for (var key in data) {
+                var item = data[key];
+                if ((item.horaEnt.toLowerCase()==hora || item.horaEnt.toLowerCase()<hora) && item.idCubiculo.toLowerCase()==idCubiculo && item.fecha.toLowerCase()==fecha ) {
+                  ocupado = true;
+                }
+                if (item.horaEnt.toLowerCase()>hora && item.idCubiculo.toLowerCase()==idCubiculo && item.fecha.toLowerCase()==fecha ) {
+                  horaSal=item.horaEnt;
+                }
+            }
+            if (ocupado == false && estado == false){
+              //datos de todos los acompañantes 
+              for (var i = 1; i <= 5; i++) {
+                var acompañante = {
+                  carnet: document.getElementById('carnet' + i).value,
+                  nombre: document.getElementById('nombre' + i).value,
+                  correo: document.getElementById('correo' + i).value
+                };
+                if (acompañante.carnet!='' &&  acompañante.nombre!='' && acompañante.correo!='' ) {
+                  acompañantes.push(acompañante);
+                }
+              }
+              //Para verificar si la cantidad de acompañantes cabe en el cubiculo
+              
+                for (var key in data1) {
+                    var item1 = data1[key];
+                    if ( item1.idCubiculo.toLowerCase()==idCubiculo) {
+                      var total=acompañantes.length+1;
+                      if (item1.capacidad<total) {
+                        cantAceptada=false;
+                      }
+                      break
+                    }
+                }
+              if (cantAceptada==true) {
+                dataDisplay.innerHTML += '<p>Solicitud enviada</p>';
+                saveMessage(hora,fecha,idCubiculo,carnet,acompañantes,horaSal);
+                document.getElementById('contactForm').reset();
+              }
+              else {
+                dataDisplay.innerHTML += '<p>Cantidad de acompañantes supera la capacidad del cubiculo</p>';
+                
+              }
+              
+            }else{
+              dataDisplay.innerHTML += '<p>El cubiculo esta ocupado o en mantenimiento</p>';
+            }
+            });
+            }else{
+              dataDisplay.innerHTML += '<p>El cubiculo no existe</p>';
+            }
+          });
+        }
+        
+          
+      }
+
+      // Function to get form values
+      function getInputVal(id) {
+        return document.getElementById(id).value;
+      }
+
+      //Función para guardar datos anidados en la base 
+        function saveMessage(hora, fecha, idCubiculo, carnet, acompañantes,horaSal) {
+          var newMessageRef = messagesRefAsignacion.push();
+          
+          var mensaje = {
+            fecha: fecha,
+            horaEnt: hora,
+            horaSal: horaSal,
+            requisitosE: "No",
+            confirmado: "Sin confirmar",
+            idCubiculo: idCubiculo,
+            carnet: carnet,
+            acompañantes: []
+          };
+          
+          for (var i = 0; i < acompañantes.length; i++) {
+            var acompanante = acompañantes[i];
+            mensaje.acompañantes.push({
+              carnet: acompanante.carnet,
+              nombre: acompanante.nombre,
+              correo: acompanante.correo
+            });
+          }
+          
+          newMessageRef.set(mensaje);
+        }
+
+
+    </script>
+  </body>
+</html>

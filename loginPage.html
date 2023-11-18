@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="public/styles/mainStyle.css" />
+    <link rel="stylesheet" href="public/styles/loginPage.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Login</title>
+  </head>
+
+  <body>
+    <header>
+      <img src="public/images/bbLogo.png" class="logo" />
+      <label><strong>Biblio-Booking</strong></label> 
+      <div class="containerRight">
+        <a href="mainPage.html"><input type="submit" class="btnBack" value="Regresar"/></a>
+      </div>
+    </header>
+        
+    <div class="container">  
+      <div class="welcome">
+        <h2>Bienvenido a Biblio-Booking</h2>
+        <br />
+        <p>Inicie sesión para continuar</p>
+        <img
+          src="public/images/backgroundMain.jpg"
+          width="500"
+          height="500"
+        /><br />
+      </div>
+      <div class="login">
+        <!-- <form action="mainPage.html"> -->
+        <form id="loginPage">
+          <h2>Iniciar Sesión</h2>
+          <div class="inputDiv">
+            <div>
+              <h4>Correo electrónico</h4>
+              <input id="email" class="input" type="text" required />
+            </div>
+          </div>
+
+          <div class="inputDiv">
+            <div>
+              <h4>Contraseña</h4>
+              <input id="contrasenna" class="input" type="password" required />
+            </div>
+          </div>
+          <!-- <a href="startPage.html"><input id="botonIngresar" type="submit" class="btn" value="Ingresar"></a> -->
+          <input id="botonIngresar" type="button" class="btn" value="Ingresar">
+
+          <h4><div id="dataDisplay" style = "display: flex; justify-content: center"></div></h4>
+          <a href="registerPage.html">¿No tienes cuenta para ingresar? Regístrate</a>
+        </form>
+      </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyBs0ZtPmiewSJ5orwoYTuZKuD1uPlJlpOU",
+        authDomain: "pruebareque2.firebaseapp.com",
+        databaseURL: "https://pruebareque2-default-rtdb.firebaseio.com",
+        projectId: "pruebareque2",
+        storageBucket: "pruebareque2.appspot.com",
+        messagingSenderId: "430710672818",
+        appId: "1:430710672818:web:8417957c13b58d8beba8ab",
+        measurementId: "G-ZHHEESZQXC",
+      };
+
+      firebase.initializeApp(firebaseConfig);
+
+      var messagesRef = firebase.database().ref("Usuario");
+
+      document
+        .getElementById("botonIngresar")
+        .addEventListener("click", revisarUser);
+
+      function revisarUser() {
+        var email = getInputVal("email");
+        var contrasenna = getInputVal("contrasenna");
+
+        messagesRef.once('value', function(snapshot) {
+          var data = snapshot.val();
+          var dataDisplay = document.getElementById('dataDisplay');
+          dataDisplay.innerHTML = '';
+
+          for (var key in data) {
+              var item = data[key];
+              if (item.email==email && item.contrasenna==contrasenna && email!='' && contrasenna!='') {
+                if(item.idTipo=="Estudiante"){
+                  localStorage.setItem("carnet", item.carnet);
+                  window.location.href = "startPage.html";
+                }
+                else{
+                  window.location.href = "startAdmin.html";
+                }
+              }
+          }
+          if (dataDisplay.innerHTML == '') {
+              dataDisplay.innerHTML += '<p>El usuario no existe</p>';
+          }
+        });
+      }
+
+      // Function to get form values
+      function getInputVal(id) {
+        return document.getElementById(id).value;
+      }
+    </script>
+  </body>
+</html>
+

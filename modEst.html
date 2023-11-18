@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="public/styles/mainStyle.css" />
+    <link rel="stylesheet" href="public/styles/solicitudPage.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Estudiantes</title>
+  </head>
+  <header>
+    <img src="public/images/bbLogo.png" class="logo" />
+    <label><strong>Biblio-Booking</strong></label>
+  </header>
+
+  <body>
+    <form id="container">
+      <div class="container">
+        <div class="column left-column">
+          <div class="title">
+            <h1>Modificar estudiante</h1>
+          </div>
+          <br />
+          <div class="formulario">
+            <label for="carnet">Carnet:</label>
+            <br />
+            <input type="text" id="carnet" name="numero" required />
+            <br />
+
+            <label for="name">Nombre:</label>
+            <br />
+            <input type="text" id="name" name="nombre" required />
+            <br />
+
+            <label for="apellido1">Primer Apellido:</label>
+            <br />
+            <input type="text" id="apellido1" name="prmapellido" required />
+            <br />
+
+            <label for="apellido2">Segundo Apellido:</label>
+            <br />
+            <input type="text" id="apellido2" name="segapellido" required />
+            <br />
+
+            <label for="fechaNa">Fecha nacimiento:</label>
+            <br />
+            <input type="date" id="fechaNa" name="fechanac" required />
+            <br />
+
+            <label for="email">Correo electrónico:</label>
+            <br />
+            <input type="text" id="email" name="correo" required />
+            <br />
+
+            <label for="contrasenna">Contraseña:</label>
+            <br />
+            <input type="password" id="contrasenna" name="pass" required />
+            <br />
+
+            <label for="estado">Estado:</label>
+            <select id="estado" name="estado">
+              <option value="Activo" selected="selected">Activo</option>
+              <option value="Suspendido">Suspendido</option>
+            </select>
+          </div>
+        </div>
+        <div class="column right-column">
+          <h4><label>Estudiante encontrado:</label></h4>
+          <br />
+          <h4><div id="dataDisplay" style = "display: block; justify-content: center"></div></h4>
+          <input id = "botonBuscar" type="button" class="btn" value="Buscar estudiante por carnet" style="margin-bottom: 0px"/>
+          <input id = "botonGuardar" type="button" class="btn" value="Guardar cambios"/><br />
+        </div>
+      </div>
+    </form>
+    <script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyBs0ZtPmiewSJ5orwoYTuZKuD1uPlJlpOU",
+        authDomain: "pruebareque2.firebaseapp.com",
+        databaseURL: "https://pruebareque2-default-rtdb.firebaseio.com",
+        projectId: "pruebareque2",
+        storageBucket: "pruebareque2.appspot.com",
+        messagingSenderId: "430710672818",
+        appId: "1:430710672818:web:8417957c13b58d8beba8ab",
+        measurementId: "G-ZHHEESZQXC",
+      };
+
+      firebase.initializeApp(firebaseConfig);
+
+      var messagesRef = firebase.database().ref("Usuario");
+      var messagesRef2 = firebase.database().ref("Asignacion");
+
+      document
+        .getElementById("botonGuardar")
+        .addEventListener("click", modificarUsuario);
+
+      function modificarUsuario(){
+        var name = getInputVal("name");
+        var apellido1 = getInputVal("apellido1");
+        var apellido2 = getInputVal("apellido2");
+        var carnet = getInputVal("carnet");
+        var email = getInputVal("email");
+        var contrasenna = getInputVal("contrasenna");
+        var fechaNa = getInputVal("fechaNa");
+        var dataDisplay = document.getElementById('dataDisplay');
+        var llave = "";
+        var carnetAnterior = localStorage.getItem("carnetAnterior");
+        if(carnetAnterior==""){
+          dataDisplay.innerHTML += '<p>Busque un usuario primero</p>';
+        }
+        else{
+          messagesRef.once('value', function(snapshot) {
+          var data = snapshot.val();
+          dataDisplay.innerHTML = '';
+
+          for (var key in data) {
+              var item = data[key];
+              if (item.carnet.toLowerCase()==carnetAnterior) {
+                llave = key;
+              }
+          }
+          if(llave!=""){
+            var item = data[llave];
+            if(name==""){
+              name = item.name;
+            }if(apellido1==""){
+              apellido1 = item.apellido1;
+            }if(apellido2==""){
+              apellido2 = item.apellido2;
+            }if(email==""){
+              email = item.email;
+            }if(contrasenna==""){
+              contrasenna = item.contrasenna;
+            }if(fechaNa==""){
+              fechaNa = item.fechaNa;
+            }if(carnet==""){
+              carnet = item.carnet;
+            }
+            else{
+              messagesRef2.once('value', function(snapshot) {
+                var data = snapshot.val();
+                dataDisplay.innerHTML = '';
+
+                for (var key in data) {
+                    var item = data[key];
+                    if (item.carnet.toLowerCase()==carnetAnterior) {
+                      messagesRef2.child(key).update({ carnet: carnet });
+                    }
+                }
+              });
+            }
+            messagesRef.child(llave).update({ name: name, apellido1: apellido1, apellido2: apellido2, email: email, contrasenna: contrasenna, fechaNa: fechaNa, carnet: carnet });
+            document.getElementById('container').reset();
+            dataDisplay.innerHTML += '<p>Usuario modificado</p>';
+          }
+          });
+        }
+      }
+      document
+        .getElementById("botonBuscar")
+        .addEventListener("click", buscarUsuario);
+        
+      function buscarUsuario(){
+        var carnet = getInputVal("carnet");
+        localStorage.setItem("carnetAnterior", carnet);
+
+        var dataDisplay = document.getElementById('dataDisplay');
+        dataDisplay.innerHTML = '';
+
+        messagesRef.once('value', function(snapshot) {
+          var data = snapshot.val();
+
+          for (var key in data) {
+              var item = data[key];
+              if (item.carnet.toLowerCase()==carnet) {
+                document.getElementById("name").setAttribute("value", item.name);
+                document.getElementById("apellido1").setAttribute("value", item.apellido1);
+                document.getElementById("apellido2").setAttribute("value", item.apellido2);
+                document.getElementById("carnet").setAttribute("value", item.carnet);
+                document.getElementById("contrasenna").setAttribute("value", item.contrasenna);
+                document.getElementById("email").setAttribute("value", item.email);
+                document.getElementById("fechaNa").value =item.fechaNa;
+                document.getElementById("estado").value =item.idEstado;
+              }
+          }
+        });
+      }
+
+      // Function to get form values
+      function getInputVal(id) {
+        return document.getElementById(id).value;
+      }
+
+      // Save message to firebase
+      function saveMessage(name, apellido1, apellido2, carnet, email, contrasenna, fechaNa) {
+        var newMessageRef = messagesRef.push();
+        newMessageRef.set({
+          name: name,
+          apellido1: apellido1,
+          apellido2: apellido2,
+          carnet: carnet,
+          email: email,
+          contrasenna: contrasenna,
+          fechaNa: fechaNa,
+          idTipo: "Tipo1",
+          idEstado: "EstadoU1",
+        });
+      }
+    </script>
+
+  </body>
+</html>

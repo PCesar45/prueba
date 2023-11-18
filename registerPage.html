@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="public/styles/mainStyle.css" />
+    <link rel="stylesheet" href="public/styles/loginPage.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Registrar</title>
+  </head>
+
+  <body>
+    <header>
+      <img src="public/images/bbLogo.png" class="logo" />
+      <label><strong>Biblio-Booking</strong></label>
+      <div class="containerRight">
+        <a href="mainPage.html"><input type="submit" class="btnBack" value="Regresar"/></a>
+      </div>
+     </header>
+
+    <div class="container">
+      <div class="welcome">
+        <h2>Bienvenido a Biblio-Booking</h2>
+        <br />
+        <p>Para registrarse ingrese los datos requeridos</p>
+        <img
+          src="public/images/backgroundMain.jpg"
+          width="500"
+          height="500"
+        /><br />
+        <a href="loginPage.html">¿Ya tienes cuenta para ingresar? <br />Inicia sesión</a>
+      </div>
+   
+    <div class="login">
+      <!-- <form action="mainPage.html" id="registerPage"> -->
+      <form id="registerPage">
+        <h2>Registrar cuenta</h2>
+        <h4><div id="dataDisplay" style = "display: flex; justify-content: center"></div></h4>
+        <div class="inputDiv">
+          <div>
+            <h4>Nombre</h4>
+            <input id="name" class="input" type="text" required/>
+          </div>
+        </div>
+        <div class="inputDiv">
+          <div>
+            <h4>Primer Apellido</h4>
+            <input id="apellido1" class="input" type="text" required/>
+          </div>
+        </div>
+        <div class="inputDiv">
+          <div>
+            <h4>Segundo Apellido</h4>
+            <input id="apellido2" class="input" type="text" required/>
+          </div>
+        </div>
+        <div class="inputDiv">
+          <div>
+            <h4>Contraseña</h4>
+            <input id="contrasenna" class="input" type="password" required/>
+          </div>
+        </div>
+        <div class="inputDiv">
+          <div>
+            <h4>Carnet</h4>
+            <input id="carnet" class="input" type="text" required/>
+          </div>
+        </div>
+        <div class="inputDiv">
+          <div>
+            <h4>Correo electrónico</h4>
+            <input id="email" class="input" type="text" required/>
+          </div>
+        </div>
+        <div class="campo">
+          <h4>Fecha de nacimiento</h4>
+
+          <input
+            type="date"
+            id="fechaNa"
+            name="fechaNa"
+            value=""
+          />
+          <script>
+            document.getElementById("fechaNa").valueAsDate = new Date();
+          </script>
+        </div>
+        <!-- <input type="checkbox" id="terminos" name="terminos" value="Aceptar términos y condiciones" required>
+        <label for="terminos"> Aceptar términos y condiciones</label><br>
+        <input id="botonRegistrar" type="submit" class="btn" value="Registrar nuevo usuario" /> -->
+        <input id="botonRegistrar" type="button" class="btn" value="Registrar nuevo usuario" />
+      </form>
+    </div>
+  </div>
+    <script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyBs0ZtPmiewSJ5orwoYTuZKuD1uPlJlpOU",
+        authDomain: "pruebareque2.firebaseapp.com",
+        databaseURL: "https://pruebareque2-default-rtdb.firebaseio.com",
+        projectId: "pruebareque2",
+        storageBucket: "pruebareque2.appspot.com",
+        messagingSenderId: "430710672818",
+        appId: "1:430710672818:web:8417957c13b58d8beba8ab",
+        measurementId: "G-ZHHEESZQXC",
+      };
+
+      firebase.initializeApp(firebaseConfig);
+
+      var messagesRef = firebase.database().ref("Usuario");
+
+      document
+        .getElementById("botonRegistrar")
+        .addEventListener("click", submitForm);
+
+      function submitForm() {
+        //e.preventDefault();
+
+        // Get values
+        var name = getInputVal("name");
+        var apellido1 = getInputVal("apellido1");
+        var apellido2 = getInputVal("apellido2");
+        var carnet = getInputVal("carnet");
+        var email = getInputVal("email");
+        var contrasenna = getInputVal("contrasenna");
+        var fechaNa = getInputVal("fechaNa");
+
+        const mayusculas = /[A-Z]/;
+        const minusculas = /[a-z]/;
+        const especiales = /[!@#$%^&*(),.?":{}|<>-]/;
+
+        var dataDisplay = document.getElementById('dataDisplay');
+        var copia = false;
+
+        // Limpia la pantalla
+        dataDisplay.innerHTML = '';
+
+        if (name=='' || apellido1=='' || apellido2=='' || carnet=='' || email=='' || contrasenna=='' || fechaNa=='') {
+          dataDisplay.innerHTML += '<p>Llene todos los espacios en blanco</p>';
+        }else if (!email.includes("@estudiantec.cr")) {
+          dataDisplay.innerHTML += '<p>Ingrese un correo del Tec</p>';
+        }else if (contrasenna.length < 8 || !mayusculas.test(contrasenna) || !minusculas.test(contrasenna) || !especiales.test(contrasenna)){
+          dataDisplay.innerHTML += '<p>La contraseña debe poseer minimo 8 caracteres con una mayúscula, una minúscula y un símbolo especial</p>';
+        } else {
+          messagesRef.once('value', function(snapshot) {
+          var data = snapshot.val();
+
+          for (var key in data) {
+              var item = data[key];
+              if (item.carnet.toLowerCase()==carnet) {
+                copia = true;
+              }
+          }
+          if (copia == false) {
+            saveMessage(name, apellido1, apellido2, carnet, email, contrasenna, fechaNa);
+
+            dataDisplay.innerHTML += '<p>Usuario creado exitosamente</p>';
+            var form = document.createElement('form');
+            form.action = 'https://formsubmit.co/' + email;
+            form.method = 'POST';
+            form.target = '_blank';
+            var bienvenida = document.createElement('input');
+            bienvenida.name = 'Biblioteca Jose Figueres Ferrer';
+            bienvenida.value = "Bienvenido al sistema de apartado de cubículos";
+            form.appendChild(bienvenida);
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+            
+          }else{
+            dataDisplay.innerHTML += '<p>El usuario ya existe</p>';
+          }
+          });
+        }
+      }
+
+      // Function to get form values
+      function getInputVal(id) {
+        return document.getElementById(id).value;
+      }
+
+      // Save message to firebase
+      function saveMessage(name, apellido1, apellido2, carnet, email, contrasenna, fechaNa) {
+        var newMessageRef = messagesRef.push();
+        newMessageRef.set({
+          name: name,
+          apellido1: apellido1,
+          apellido2: apellido2,
+          carnet: carnet,
+          email: email,
+          contrasenna: contrasenna,
+          fechaNa: fechaNa,
+          idTipo: "Estudiante",
+          idEstado: "Activo",
+        });
+      }
+    </script>
+  </body>
+ <!-- <footer>
+    <p>Contáctanos al 444-444-444 o envía un correo a Bb@tec.com</p>
+    <p>Para ver el aviso de privacidad, accede a bibliobooking.com/aviso</p>
+  </footer> -->
+</html>

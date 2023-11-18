@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="public/styles/mainStyle.css" />
+    <link rel="stylesheet" href="public/styles/solicitudPage.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Cubículos</title>
+  </head>
+  <header>
+    <img src="public/images/bbLogo.png" class="logo" />
+    <label><strong>Biblio-Booking</strong></label>
+  </header>
+
+  <body>
+    <form>
+      <div class="container">
+        <div class="column left-column">
+          <div class="title">
+            <h1>Modificar cubículo</h1>
+          </div>
+
+          <div class="formulario">
+            <label for="numero">Número de cubículo:</label>
+            <br />
+            <input type="text" id="numero" name="numero" required />
+            <br />
+
+            <label for="nombre">Nombre:</label>
+            <br />
+            <input type="text" id="nombre" name="nombre" required />
+            <br />
+
+            <label for="ubicacion">Ubicación:</label>
+            <br />
+            <input type="text" id="ubicacion" name="ubicacion" required />
+            <br />
+            <label for="capacidad">Capacidad:</label>
+            <br />
+            <input type="text" id="capacidad" name="capacidad" required />
+            <br /><br />
+
+            <label for="rango">Rango máximo de uso en minutos:</label>
+            <br />
+            <input type="text" id="rango" name="rango" required />
+            <br /><br />
+
+            <label for="servicioE">Servicios Especiales:</label>
+            <select id="servicioE" name="servicioE"style="width: 35%">
+              <option value="No">No</option>
+              <option value="Si">Sí</option>
+            </select>
+            <br /><br /><br />
+            <label for="estado">Estado:</label>
+            <select id="estado" name="estado" style="width: 59%">
+              <option value="Libre">Libre</option>
+              <option value="Ocupado">Ocupado</option>
+              <option value="Mantenimiento">Mantenimiento</option>
+            </select>
+            <br />
+            
+          </div>
+        </div>
+        <div class="column right-column">
+          <h4><div id="dataDisplay" style = "display: flex; justify-content: center"></div></h4>
+          <input id="btnBuscar" type="button" class="btn" value="Buscar cubículo" style="margin-bottom: 0px"/>
+          <a><input id="btnModificar" type="button" class="btn" value="Guardar cambios" onclick="return confirm('¿Está seguro de que quiere modificar este estudiante?')"/><br /></a>
+        </div>
+      </div>
+    </form>
+    <script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyBs0ZtPmiewSJ5orwoYTuZKuD1uPlJlpOU",
+        authDomain: "pruebareque2.firebaseapp.com",
+        databaseURL: "https://pruebareque2-default-rtdb.firebaseio.com",
+        projectId: "pruebareque2",
+        storageBucket: "pruebareque2.appspot.com",
+        messagingSenderId: "430710672818",
+        appId: "1:430710672818:web:8417957c13b58d8beba8ab",
+        measurementId: "G-ZHHEESZQXC"
+      };
+      // Function to get form values
+      function getInputVal(id) {
+        return document.getElementById(id).value;
+      }
+
+      firebase.initializeApp(firebaseConfig);
+
+      var messagesRef = firebase.database().ref('Cubiculo');
+      var messagesRef2 = firebase.database().ref("Asignacion");
+      document
+        .getElementById("btnModificar")
+        .addEventListener("click", ModificarCubiculo);
+
+      document
+      .getElementById("btnBuscar")
+      .addEventListener("click", BuscarCubiculo);
+      var actualID;
+
+      //Funcion para buscar el cubiculo a modificar
+      function BuscarCubiculo() {
+        //e.preventDefault();
+        
+        // Get values
+        var idCubiculo ="cub"+document.getElementById("numero").value;
+        
+
+
+        messagesRef.once('value', function(snapshot) {
+        var data = snapshot.val();
+        var dataDisplay = document.getElementById('dataDisplay');
+
+        // Limpia la pantalla
+        dataDisplay.innerHTML = '';
+
+        // Agrega toda la informacion a pantalla de la clase seleccionada
+        for (var key in data) {
+            var item = data[key];
+            
+            if (item.idCubiculo.toLowerCase()==idCubiculo ) {
+              document.getElementById("nombre").setAttribute("value", item.nombre);
+              document.getElementById("ubicacion").setAttribute("value", item.ubicacion);
+              document.getElementById("capacidad").setAttribute("value", item.capacidad);
+              document.getElementById("rango").setAttribute("value", item.tiempoMaxUso);
+              document.getElementById("servicioE").value = item.servicioE;
+              document.getElementById("estado").value = item.idEstadoC;
+              //document.getElementById('formulario1').reset();
+              actualID="cub"+document.getElementById("numero").value;
+              break
+            }
+        }
+        
+        });
+           
+      }
+      //Funcion para modificar datos
+      function ModificarCubiculo() {
+        //e.preventDefault();
+
+        // Get values
+        var newidCubiculo ="cub"+document.getElementById("numero").value;
+        var newnombre =getInputVal('nombre');
+        var newubicacion =getInputVal('ubicacion');
+        var newcapacidad =getInputVal('capacidad');
+        var newrango =document.getElementById("rango").value;
+        var newservicios =document.getElementById("servicioE").value;
+        var newestado =document.getElementById("estado").value;
+
+
+        messagesRef.once('value', function(snapshot) {
+        var data = snapshot.val();
+        var dataDisplay = document.getElementById('dataDisplay');
+
+        // Limpia la pantalla
+        dataDisplay.innerHTML = '';
+
+        // Agrega toda la informacion a pantalla de la clase seleccionada
+        for (var key in data) {
+            var item = data[key];
+            // Se puede cambiar .startsWith() por .includes() para que detecta las palabras buscadas en cualquier posicion de las palabras almacenadas
+            if (item.idCubiculo.toLowerCase()==actualID ) {
+                //messagesRef.child(key).update({ ubicacion: newubicacion, capacidad: newcapacidad,servicioE:newservicios,idEstadoC:newestado });
+                if (newnombre!='' && newubicacion!=''&& newcapacidad!=''&& newrango!='') {
+                  messagesRef.child(key).update({idCubiculo: newidCubiculo,nombre:newnombre, ubicacion: newubicacion, capacidad: newcapacidad,tiempoMaxUso:newrango, servicioE:newservicios,idEstadoC:newestado });
+                  
+                  //Modificacion en tabla asignacion
+                  messagesRef2.once('value', function(snapshot) {
+                    var data = snapshot.val();
+                    dataDisplay.innerHTML = '';
+
+                    for (var key in data) {
+                        var item = data[key];
+                        if (item.idCubiculo.toLowerCase()==actualID) {
+                          messagesRef2.child(key).update({ idCubiculo: newidCubiculo });
+                        }
+                    }
+                  });
+                  dataDisplay.innerHTML += '<p>Dato modificado</p>';
+                }
+                else{
+                  dataDisplay.innerHTML += '<p>¡Por favor, llene todos los campos!</p>';
+                }
+                //document.getElementById('formulario1').reset();
+                break
+            }
+        }
+        if (dataDisplay.innerHTML == '') {
+            dataDisplay.innerHTML += '<p>No existen similitudes</p>';
+        }
+        });
+           
+      }
+    </script>
+  </body>
+</html>

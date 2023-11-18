@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="public/styles/mainStyle.css" />
+    <link rel="stylesheet" href="public/styles/solicitudPage.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Cubículos</title>
+  </head>
+
+  <header>
+    <img src="public/images/bbLogo.png" class="logo" />
+    <label><strong>Biblio-Booking</strong></label>
+    <div class="containerRight">
+        <a href="asignaciones.html"><input type="submit" class="btnBack" value="Regresar"/></a>
+    </div>
+  </header>
+
+  <body>
+    <form>
+        <div class="container">
+            <div class="title">
+                <h1>Información de asignación específica</h1>
+              </div>
+          <div class="column left-column">
+            <br /><br /><br />
+            <div class="formulario">
+
+                <label for="carnet">Carnet:</label>
+                <br />
+                <input type="text" id="carnet" name="carnet" required />
+                <br /><br />
+
+                <label for="fecha">Fecha:</label>
+                <br />
+                <input type="date" id="fecha" name="fecha" required />
+                <br /><br />
+            </div>
+          </div>
+          <div class="column right-column" style="margin-top: 75px;">
+            <label for="horaEnt">Hora entrada:</label>
+                <br />
+                <input type="text" id="horaEnt" name="horaEnt" required />
+                <br /><br />
+
+                <label for="horaSal">Hora salida:</label>
+                <br />
+                <input type="text" id="horaSal" name="horaSal" required />
+                <br /><br />
+
+                <input type="checkbox" id="requisitos" name="requisitos"/>
+                <label for="requisitos">Requisitos especiales</label>
+          </div>
+          <input id = "guardar" type="button" class="btn" value="Guardar cambios" style="margin-bottom: 5px;"/><br />
+          <input id = "eliminar" type="button" class="btn" value="Eliminar asignación" style="margin-bottom: 5px;"/>
+          <h4><div id="dataDisplay" style = "display: flex; justify-content: center"></div></h4>
+          <h4><div id="dataDisplay2" style = "display: flex; justify-content: center"></div></h4>
+        </div>
+      </form>
+      <script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyBs0ZtPmiewSJ5orwoYTuZKuD1uPlJlpOU",
+        authDomain: "pruebareque2.firebaseapp.com",
+        databaseURL: "https://pruebareque2-default-rtdb.firebaseio.com",
+        projectId: "pruebareque2",
+        storageBucket: "pruebareque2.appspot.com",
+        messagingSenderId: "430710672818",
+        appId: "1:430710672818:web:8417957c13b58d8beba8ab",
+        measurementId: "G-ZHHEESZQXC",
+      };
+
+      firebase.initializeApp(firebaseConfig);
+
+      var messagesRef = firebase.database().ref("Asignacion");
+      var messagesRef2 = firebase.database().ref("Usuario");
+      
+      //MostrarDatos();
+      document.getElementById("carnet").setAttribute("value",localStorage.getItem("carnetEst"));
+      document.getElementById("fecha").setAttribute("value",localStorage.getItem("fechaAsig"));
+      document.getElementById("horaEnt").setAttribute("value",localStorage.getItem("horaEnt"));
+      document.getElementById("horaSal").setAttribute("value",localStorage.getItem("horaSal"));
+
+
+      
+       document
+        .getElementById("eliminar")
+        .addEventListener("click", eliminarAsignacion);
+      document
+        .getElementById("guardar")
+        .addEventListener("click", modificarAsignacion);
+
+      function eliminarAsignacion(){
+        var idCubiculo = localStorage.getItem("idCubiculo");
+        var hora = localStorage.getItem("horaEnt");
+        var fecha = localStorage.getItem("fechaAsig");
+        var carnet = localStorage.getItem("carnetEst");
+        var email = "";
+        messagesRef.once('value', function(snapshot) {
+          var data = snapshot.val();
+          var dataDisplay = document.getElementById('dataDisplay');
+          dataDisplay.innerHTML = '';
+          for (var key in data) {
+              var item = data[key];
+              if (item.idCubiculo.toLowerCase()==idCubiculo && item.horaEnt==hora && item.fecha==fecha && item.carnet==carnet) {
+                messagesRef.child(key).remove()
+                dataDisplay.innerHTML += '<p>Dato eliminado</p>';
+
+                messagesRef2.once('value', function(snapshot) {
+                var form = document.createElement('form');
+                var data2 = snapshot.val();
+                for (var key in data2) {
+                  var item2 = data2[key];
+                  if (item2.carnet==carnet){
+                    email=item2.email;
+                  }
+                }
+                form.action = 'https://formsubmit.co/' + email;
+                form.method = 'POST';
+                form.target = '_blank';
+                var info = document.createElement('input');
+                info.name = 'Biblioteca Jose Figueres Ferrer';
+                info.value = "Su asignacion el " + fecha + " a las " + hora + " ha sido eliminada";
+                form.appendChild(info);
+                document.body.appendChild(form);
+                form.submit();
+                document.body.removeChild(form);
+                });
+              }
+          }
+          if (dataDisplay.innerHTML == '') {
+              dataDisplay.innerHTML += '<p>La asignacion no existe</p>';
+          }
+        });
+      }
+      function modificarAsignacion(){
+        var idCubiculo = localStorage.getItem("idCubiculo");
+        var hora = localStorage.getItem("horaEnt");
+        var fecha = localStorage.getItem("fechaAsig");
+        var carnet = localStorage.getItem("carnetEst");
+        var newcarnet= getInputVal("carnet");
+        var newfecha= getInputVal("fecha");
+        var newhoraEnt= getInputVal("horaEnt");
+        var newhoraSal= getInputVal("horaSal");
+
+        if (document.getElementById("requisitos").checked) {
+          var newrequisitos ="Si"
+        } else {
+          var newrequisitos ="No"
+        }
+
+        messagesRef.once('value', function(snapshot) {
+          var data = snapshot.val();
+          var dataDisplay = document.getElementById('dataDisplay');
+          dataDisplay.innerHTML = '';
+          for (var key in data) {
+              var item = data[key];
+              if (item.idCubiculo.toLowerCase()==idCubiculo && item.horaEnt==hora && item.fecha==fecha && item.carnet==carnet) {
+                if (newcarnet!='' && newhoraEnt!=''&& newhoraSal!='') {
+                  messagesRef.child(key).update({carnet:newcarnet, fecha: newfecha,horaEnt:newhoraEnt, horaSal:newhoraSal,requisitosE:newrequisitos });
+                  dataDisplay.innerHTML += '<p>Dato modificado</p>';
+                  messagesRef2.once('value', function(snapshot) {
+                  var form = document.createElement('form');
+                  var data2 = snapshot.val();
+                  for (var key in data2) {
+                    var item2 = data2[key];
+                    if (item2.carnet==carnet){
+                      email=item2.email;
+                    }
+                  }
+                  form.action = 'https://formsubmit.co/' + email;
+                  form.method = 'POST';
+                  form.target = '_blank';
+                  var info = document.createElement('input');
+                  info.name = 'Biblioteca Jose Figueres Ferrer';
+                  info.value = "Su asignacion el " + fecha + " a las " + hora + " ha sido modificada";
+                  form.appendChild(info);
+                  document.body.appendChild(form);
+                  form.submit();
+                  document.body.removeChild(form);
+                  });
+                }
+                else{
+                  dataDisplay.innerHTML += '<p>¡Por favor, llene todos los campos!</p>';
+                }
+              }
+          }
+          if (dataDisplay.innerHTML == '') {
+              dataDisplay.innerHTML += '<p>La asignacion no existe</p>';
+          }
+        });
+      }
+      // Function to get form values
+      function getInputVal(id) {
+        return document.getElementById(id).value;
+      } 
+    </script>
+ </body>
+</html>
